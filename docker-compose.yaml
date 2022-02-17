@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+    #hide these bad boys if wanna be secure 
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=root
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    networks:
+      - common
+
+  backend:
+    build: ./backend  
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "3001:3001"
+    networks:
+      - common
+
+  frontend: 
+    build: ./frontend
+    ports: 
+      - "80:80"
+    depends_on: 
+      - backend
+    networks:
+      - common
+
+networks:
+  common:
+    driver: bridge
